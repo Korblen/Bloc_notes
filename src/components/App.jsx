@@ -16,10 +16,27 @@ function App() {
   };
 
   const handleSave = () => {
-    const idToSave = currentNoteId ? currentNoteId : new Date().toISOString();
+    const idToSave = currentNoteId || new Date().toISOString();
     localStorage.setItem(idToSave, markdown);
     loadNotes();
-    setCurrentNoteId(idToSave);
+    setCurrentNoteId(idToSave); // Maintenir l'ID actuel pour les modifications ultérieures
+  };
+
+  const handleSelectNote = (id) => {
+    setMarkdown(notes[id]);
+    setCurrentNoteId(id);
+  };
+
+  const handleCreateNewNote = () => {
+    setMarkdown(''); // Réinitialiser le markdown pour une nouvelle note
+    setCurrentNoteId(null); // Réinitialiser l'ID de note actuelle
+  };
+
+  const clearNotes = () => {
+    localStorage.clear();
+    setNotes({});
+    setMarkdown('');
+    setCurrentNoteId(null);
   };
 
   const loadNotes = () => {
@@ -29,18 +46,6 @@ function App() {
       loadedNotes[key] = localStorage.getItem(key);
     }
     setNotes(loadedNotes);
-  };
-
-  const handleSelectNote = (id) => {
-    setMarkdown(notes[id]);
-    setCurrentNoteId(id);
-  };
-
-  const clearNotes = () => {
-    localStorage.clear();
-    setNotes({});
-    setMarkdown('');
-    setCurrentNoteId(null);
   };
 
   return (
@@ -53,6 +58,7 @@ function App() {
             Note at {new Date(id).toLocaleString()}
           </button>
         ))}
+        <button onClick={handleCreateNewNote}>Create New Note</button>
       </div>
       <button onClick={clearNotes}>Clear All Notes</button>
     </div>
@@ -60,4 +66,3 @@ function App() {
 }
 
 export default App;
-
