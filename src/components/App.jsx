@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MarkdownInput from './MarkdownInput';
 import NoteDisplay from './NoteDisplay';
+import Showdown from 'showdown';
 
 function App() {
   const [markdown, setMarkdown] = useState('');
@@ -19,7 +20,7 @@ function App() {
     const idToSave = currentNoteId || new Date().toISOString();
     localStorage.setItem(idToSave, markdown);
     loadNotes();
-    setCurrentNoteId(idToSave); // Maintenir l'ID actuel pour les modifications ultérieures
+    setCurrentNoteId(idToSave);
   };
 
   const handleSelectNote = (id) => {
@@ -28,8 +29,8 @@ function App() {
   };
 
   const handleCreateNewNote = () => {
-    setMarkdown(''); // Réinitialiser le markdown pour une nouvelle note
-    setCurrentNoteId(null); // Réinitialiser l'ID de note actuelle
+    setMarkdown('');
+    setCurrentNoteId(null);
   };
 
   const clearNotes = () => {
@@ -49,18 +50,24 @@ function App() {
   };
 
   return (
-    <div className="app-container">
-      <NoteDisplay markdown={markdown} />
-      <MarkdownInput markdown={markdown} onMarkdownChange={handleMarkdownChange} onSave={handleSave} />
-      <div>
-        {Object.keys(notes).map((id) => (
-          <button key={id} onClick={() => handleSelectNote(id)}>
-            Note at {new Date(id).toLocaleString()}
-          </button>
-        ))}
-        <button onClick={handleCreateNewNote}>Create New Note</button>
+    <div className="container mt-3">
+      <div className="row">
+        <div className="col-md-4">
+          <div className="list-group">
+            {Object.keys(notes).map((id) => (
+              <button key={id} className="list-group-item list-group-item-action" onClick={() => handleSelectNote(id)}>
+                Note at {new Date(id).toLocaleString()}
+              </button>
+            ))}
+          </div>
+          <button className="btn btn-primary mt-2" onClick={handleCreateNewNote}>Create New Note</button>
+          <button className="btn btn-danger mt-2" onClick={clearNotes}>Clear All Notes</button>
+        </div>
+        <div className="col-md-8">
+          <MarkdownInput markdown={markdown} onMarkdownChange={handleMarkdownChange} onSave={handleSave} />
+          <NoteDisplay markdown={markdown} />
+        </div>
       </div>
-      <button onClick={clearNotes}>Clear All Notes</button>
     </div>
   );
 }
