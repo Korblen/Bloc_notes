@@ -1,10 +1,15 @@
 import React from 'react';
 
-function MarkdownInput({ markdown, onMarkdownChange, onSave }) {
+function MarkdownInput({ note, onTitleChange, onMarkdownChange, onSave }) {
   return (
     <div>
-      <textarea value={markdown} onChange={onMarkdownChange} />
-      <button onClick={onSave}>Save</button>
+      <textarea 
+        className="form-control mb-3"
+        value={note.markdown} 
+        onChange={(e) => onMarkdownChange(e.target.value)} 
+        rows="10"
+      />
+      <button className="btn btn-success" onClick={onSave}>Save</button>
     </div>
   );
 }

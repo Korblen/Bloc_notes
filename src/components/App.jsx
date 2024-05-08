@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import MarkdownInput from './MarkdownInput';
 import NoteDisplay from './NoteDisplay';
-import Showdown from 'showdown';
 
 function App() {
-  const [markdown, setMarkdown] = useState('');
+  const [note, setNote] = useState({ title: '', markdown: '' });
   const [notes, setNotes] = useState({});
   const [currentNoteId, setCurrentNoteId] = useState(null);
 
@@ -12,31 +11,36 @@ function App() {
     loadNotes();
   }, []);
 
-  const handleMarkdownChange = (event) => {
-    setMarkdown(event.target.value);
+  const handleMarkdownChange = (markdown) => {
+    setNote(prevNote => ({ ...prevNote, markdown }));
+  };
+
+  const handleTitleChange = (title) => {
+    setNote(prevNote => ({ ...prevNote, title }));
   };
 
   const handleSave = () => {
     const idToSave = currentNoteId || new Date().toISOString();
-    localStorage.setItem(idToSave, markdown);
+    localStorage.setItem(idToSave, JSON.stringify(note));
     loadNotes();
     setCurrentNoteId(idToSave);
   };
 
   const handleSelectNote = (id) => {
-    setMarkdown(notes[id]);
+    const selectedNote = JSON.parse(notes[id]);
+    setNote(selectedNote);
     setCurrentNoteId(id);
   };
 
   const handleCreateNewNote = () => {
-    setMarkdown('');
+    setNote({ title: '', markdown: '' });
     setCurrentNoteId(null);
   };
 
   const clearNotes = () => {
     localStorage.clear();
     setNotes({});
-    setMarkdown('');
+    setNote({ title: '', markdown: '' });
     setCurrentNoteId(null);
   };
 
@@ -56,7 +60,7 @@ function App() {
           <div className="list-group">
             {Object.keys(notes).map((id) => (
               <button key={id} className="list-group-item list-group-item-action" onClick={() => handleSelectNote(id)}>
-                Note at {new Date(id).toLocaleString()}
+                {JSON.parse(notes[id]).title || 'Untitled'} - {new Date(id).toLocaleString()}
               </button>
             ))}
           </div>
@@ -64,8 +68,16 @@ function App() {
           <button className="btn btn-danger mt-2" onClick={clearNotes}>Clear All Notes</button>
         </div>
         <div className="col-md-8">
-          <MarkdownInput markdown={markdown} onMarkdownChange={handleMarkdownChange} onSave={handleSave} />
-          <NoteDisplay markdown={markdown} />
+        <NoteDisplay markdown={note.markdown} title={note.title} />
+          <input 
+            type="text" 
+            value={note.title} 
+            onChange={(e) => handleTitleChange(e.target.value)} 
+            placeholder="Note Title" 
+            className="form-control mb-2"
+          />
+          <MarkdownInput note={note} onMarkdownChange={handleMarkdownChange} onSave={handleSave} />
+
         </div>
       </div>
     </div>
